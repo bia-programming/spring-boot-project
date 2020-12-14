@@ -3,6 +3,7 @@ package com.example.spring2;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,32 +13,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class BookController {
+public class BookController {
 
-    private final BookRepository repository;
-
-    BookController(BookRepository repository) {
-        this.repository = repository;
-    }
-
-    // Aggregate root
+    @Autowired
+    private BookRepository repository;
 
     @GetMapping("/books")
     List<BookDto> all() {
         return repository.findAll().stream()
-                .map(book -> {
-                    BookDto bookDto = new BookDto(book.getAuthor(), book.getTitle());
-                    bookDto.setId(book.getId());
+                .map(bookEntity -> {
+                    BookDto bookDto = new BookDto(bookEntity.getAuthor(), bookEntity.getTitle());
+                    bookDto.setId(bookEntity.getId());
                     return bookDto;
                 }).collect(Collectors.toList());
     }
 
     @PostMapping("/books")
-    Book newBook(@RequestBody BookDto bookDto) {
-        Book book = new Book();
-        book.setTitle(bookDto.getTitle());
-        book.setAuthor(bookDto.getAuthor());
-        return repository.save(book);
+    BookEntity newBook(@RequestBody BookDto bookDto) {
+        BookEntity bookEntity = new BookEntity();
+        bookEntity.setTitle(bookDto.getTitle());
+        bookEntity.setAuthor(bookDto.getAuthor());
+        return repository.save(bookEntity);
     }
 
     // Single item
@@ -45,23 +41,23 @@ class BookController {
     @GetMapping("/books/{id}")
     BookDto one(@PathVariable Long id) {
 
-        Book book = repository.findById(id)
+        BookEntity bookEntity = repository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        BookDto bookDto = new BookDto(book.getAuthor(), book.getTitle());
-        bookDto.setId(book.getId());
+        BookDto bookDto = new BookDto(bookEntity.getAuthor(), bookEntity.getTitle());
+        bookDto.setId(bookEntity.getId());
         return bookDto;
     }
 
     @PutMapping("/books/{id}")
-    Book replaceBook(@RequestBody BookDto newBook, @PathVariable Long id) {
+    BookEntity replaceBook(@RequestBody BookDto newBook, @PathVariable Long id) {
 
 
 
         return repository.findById(id)
-                .map(book -> {
-                    book.setTitle(newBook.getTitle());
-                    book.setAuthor(newBook.getAuthor());
-                    return repository.save(book);
+                .map(bookEntity -> {
+                    bookEntity.setTitle(newBook.getTitle());
+                    bookEntity.setAuthor(newBook.getAuthor());
+                    return repository.save(bookEntity);
                 }).orElseThrow(() -> new BookNotFoundException(id));
     }
 
