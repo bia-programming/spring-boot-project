@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@WebMvcTest(SecurityConfiguration.class)
 public class BookServiceTest {
 
     @InjectMocks
@@ -22,6 +25,7 @@ public class BookServiceTest {
     private BookRepository bookRepository;
 
     @Test
+    @WithMockUser(value = "bianca")
     public void givenAnEntity_getBookById_shouldReturnValidDto(){
         BookDto bookDto = new BookDto();
         bookDto.setId(1L);

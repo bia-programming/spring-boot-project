@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BookController {
 
-    private BookService bookService;
+    private final BookService bookService;
 
 
     @GetMapping("/books")
